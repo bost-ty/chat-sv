@@ -45,11 +45,6 @@
 		<ChatMessage {time} {username} {message} />
 	{/each}
 </div>
-{#if latest}
-	<div class="latest">
-		<ChatMessage time={latest[0]} username={latest[1]} message={latest[2]} />
-	</div>
-{/if}
 
 <style>
 	.chats {
@@ -68,8 +63,5 @@
 
 	.chats:hover {
 		outline: 1px solid white;
-	}
-	.latest {
-		overflow: hidden;
 	}
 </style>
