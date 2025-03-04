@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { fade } from "svelte/transition";
 	import ChatMessage from "./ChatMessage.svelte";
 	import { parseIrc, scrollBottom } from "./chat";
 
-	let { targetChannel } = $props();
+	let { isHovered = $bindable(), targetChannel } = $props();
 
 	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
 	const NICKNAME = "justinfan1337";
 
 	let chats: HTMLDivElement;
 	let messages = $state([]);
-	let isHovered = $state(false);
 
 	$effect(() => {
 		if (!isHovered && chats && messages) scrollBottom(chats);
@@ -25,7 +25,7 @@
 		});
 
 		ws.addEventListener("message", (e) => {
-			if (e.data.includes(NICKNAME)) return;
+			if (e.data.includes(NICKNAME) || e.data.includes("PING")) return;
 			messages.push(parseIrc(e.data));
 			if (!isHovered && chats) scrollBottom(chats);
 		});
@@ -37,6 +37,7 @@
 </script>
 
 <div
+	transition:fade
 	id="chats"
 	class="chats"
 	role="list"
@@ -51,20 +52,25 @@
 
 <style>
 	.chats {
-		list-style: none;
-		padding: 1rem;
+		padding: 0.1rem 0.3rem;
 		margin: 0;
-		background-color: hsl(150, 10%, 10%);
+		background-color: hsl(150, 1%, 10%);
 		overflow-y: scroll;
 		overflow-x: hidden;
 		white-space: break-word;
 		scrollbar-width: thin;
-		height: 80vh;
-		width: 50ch;
-		position: relative;
+		width: 100%;
+		height: 85svh;
+		border-radius: 0.3rem;
+		outline: 1px solid rgba(200, 200, 200, 0);
+		filter: drop-shadow(0 0 0 lightgrey);
+		transition:
+			outline 100ms ease,
+			filter 200ms ease;
 	}
 
 	.chats:hover {
-		outline: 1px solid white;
+		outline: 1px solid lightgrey;
+		filter: drop-shaodw(0 0 0.3rem lightgrey);
 	}
 </style>
