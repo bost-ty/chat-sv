@@ -45,7 +45,7 @@
 	onmouseleave={() => (isHovered = false)}
 >
 	{#each messages as [time, username, message]}
-		<ChatMessage {time} {username} {message} bgColor={getPseudorandomHslColor()} />
+		<ChatMessage {time} {username} {message} />
 	{/each}
 </div>
 

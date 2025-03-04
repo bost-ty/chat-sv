@@ -1,12 +1,13 @@
 <script>
-	let { time, username, message, bgColor } = $props();
+	import { getPseudorandomHslColor } from "./chat";
+	let { time, username, message } = $props();
 </script>
 
 <div>
 	<span class="time">{time}</span>
-	<span class="username" style="background-color:{bgColor}">{username}</span><span
-		class="separator">:&nbsp;</span
-	><span class="message">{message}</span>
+	<span class="username" style="color:{getPseudorandomHslColor(username)}"
+		>{username}</span
+	><span class="separator">:</span>&nbsp;<span class="message">{message}</span>
 </div>
 
 <style>
@@ -23,6 +24,5 @@
 	.username {
 		font-weight: 700;
 		letter-spacing: 0.01rem;
-		color: lightgrey;
 	}
 </style>

@@ -14,9 +14,11 @@ export function scrollBottom(element) {
 	}, 0);
 }
 
-export function getPseudorandomHslColor() {
-	let h = Math.floor(Math.random() * 360);
+export function getPseudorandomHslColor(username) {
+	let usernameHash = [...username].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+	let h = usernameHash % 361;
+	// let h = Math.floor(Math.random() * 360);
 	let s = "80%";
-	let l = "40%";
+	let l = "60%";
 	return `hsl(${h} ${s} ${l})`;
 }
