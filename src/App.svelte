@@ -18,6 +18,7 @@
 	}
 </script>
 
+<!-- This whole <section> could be extracted into a component and reused! -->
 <section>
 	<form onsubmit={handleSubmit}>
 		<label
