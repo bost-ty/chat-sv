@@ -62,15 +62,10 @@
 		width: 100%;
 		height: 85svh;
 		border-radius: 0.3rem;
-		outline: 1px solid rgba(200, 200, 200, 0);
-		filter: drop-shadow(0 0 0 lightgrey);
-		transition:
-			outline 100ms ease,
-			filter 200ms ease;
+		outline: 0.1rem solid transparent;
 	}
 
 	.chats:hover {
-		outline: 1px solid lightgrey;
-		filter: drop-shaodw(0 0 0.3rem lightgrey);
+		outline: 0.1rem solid lightgrey;
 	}
 </style>
