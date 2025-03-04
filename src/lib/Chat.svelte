@@ -11,7 +11,6 @@
 	let chats: HTMLDivElement;
 	let messages = $state([]);
 	let isHovered = $state(false);
-	let latest = $derived(messages.at(-1));
 
 	$effect(() => {
 		if (!isHovered && chats && messages) scrollBottom(chats);
@@ -29,6 +28,10 @@
 			if (e.data.includes(NICKNAME)) return;
 			messages.push(parseIrc(e.data));
 			if (!isHovered && chats) scrollBottom(chats);
+		});
+
+		ws.addEventListener("error", (e) => {
+			console.error(e);
 		});
 	});
 </script>
