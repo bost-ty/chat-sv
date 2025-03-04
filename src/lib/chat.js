@@ -13,3 +13,10 @@ export function scrollBottom(element) {
 		element.scrollTop = element.scrollHeight - element.clientHeight;
 	}, 0);
 }
+
+export function getPseudorandomHslColor() {
+	let h = Math.floor(Math.random() * 360);
+	let s = "80%";
+	let l = "40%";
+	return `hsl(${h} ${s} ${l})`;
+}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import ChatMessage from "./ChatMessage.svelte";
-	import { parseIrc, scrollBottom } from "./chat";
+	import { getPseudorandomHslColor, parseIrc, scrollBottom } from "./chat";
 
 	let { targetChannel } = $props();
 
@@ -45,7 +45,7 @@
 	onmouseleave={() => (isHovered = false)}
 >
 	{#each messages as [time, username, message]}
-		<ChatMessage {time} {username} {message} />
+		<ChatMessage {time} {username} {message} bgColor={getPseudorandomHslColor()} />
 	{/each}
 </div>
 
