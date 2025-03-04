@@ -7,8 +7,14 @@
 
 	function handleSubmit(e) {
 		e.preventDefault();
-		submitted = true;
-		targetChannel = value.toLowerCase();
+		if (!submitted) {
+			submitted = true;
+			targetChannel = value.toLowerCase();
+		} else {
+			submitted = false;
+			value = "";
+			targetChannel = value;
+		}
 	}
 </script>
 
@@ -21,7 +27,7 @@
 				bind:value
 			/>
 		</label>
-		<button type="submit">Connect</button>
+		<button type="submit">{!submitted ? "Connect" : "Disconnect"}</button>
 	</form>
 	{#if submitted}
 		<h2>{targetChannel}</h2>
