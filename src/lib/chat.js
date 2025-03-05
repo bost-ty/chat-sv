@@ -37,8 +37,8 @@ function hashStringToNumber(string) {
  */
 export function stringToHslColor(string) {
 	let stringHash = hashStringToNumber(string);
-	let h = stringHash % 361; // put stringHash between 0 and 360 for the hue value
-	let s = "80%";
-	let l = "60%";
+	let h = stringHash % 361; // puts stringHash between 0 and 360 for the hue value
+	let s = "75%";
+	let l = "50%";
 	return `hsl(${h} ${s} ${l})`;
 }

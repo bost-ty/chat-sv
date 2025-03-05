@@ -6,8 +6,6 @@
 	let targetChannel = $state("");
 	let value = $state("");
 
-	$inspect(sharedState.channels);
-
 	function handleSubmit(e) {
 		e.preventDefault();
 		const twitchUsernameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]{0,23}$/;
@@ -32,7 +30,7 @@
 <section>
 	<form onsubmit={handleSubmit}>
 		<label>Enter channel name: <input type="text" bind:value /> </label>
-		<button type="submit"><SquarePlus size={20} />Connect to channel</button>
+		<button type="submit"><SquarePlus size={18} />Connect</button>
 		{#if sharedState.formMessage}
 			<span class="formMessage">
 				{sharedState.formMessage}
@@ -63,14 +61,9 @@
 		display: flex;
 		gap: 1rem;
 		align-items: center;
-		margin-bottom: 1rem;
-	}
-	.formMessage {
-		margin-left: 1rem;
 	}
 	.chatsContainer {
 		display: flex;
 		flex-flow: row wrap;
-		gap: 1rem;
 	}
 </style>

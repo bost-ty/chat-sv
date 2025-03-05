@@ -14,10 +14,10 @@
 </script>
 
 <div class="chatManager">
-	<div style="display: flex; align-items: center; gap: 1rem;">
+	<div class="chatHeader">
 		<h2>{targetChannel}</h2>
 		<button type="button" onclick={() => disconnectChannel(targetChannel)}
-			><SquareMinus size={20} />Disconnect</button
+			><SquareMinus size={18} />Disconnect</button
 		>
 	</div>
 	<ChatLog {targetChannel} bind:isHovered />
@@ -36,8 +36,15 @@
 		gap: 0.3rem;
 	}
 	.chatManager {
+		margin-inline: 1rem;
 		position: relative;
 		flex: 1 0 21%;
+	}
+
+	.chatHeader {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
 	}
 
 	.hoverMessage {
@@ -45,15 +52,14 @@
 		bottom: 1rem;
 		left: 0;
 		right: 0;
-		background-color: hsl(150, 1%, 20%);
-		width: fit-content;
+		border-radius: 0.3rem;
 		padding: 0.2rem 0.6rem;
+		width: fit-content;
 		margin-inline: auto;
 		text-align: center;
-		pointer-events: none;
-		outline: 1px solid lightgrey;
-		color: lightgrey;
-		border-radius: 0.3rem;
 		font-weight: 500;
+		background-color: var(--bg);
+		outline: 1px solid var(--ac);
+		pointer-events: none;
 	}
 </style>

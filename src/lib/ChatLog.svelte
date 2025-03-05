@@ -63,18 +63,18 @@
 	.chatLog {
 		padding: 0.1rem 0.3rem;
 		margin: 0;
-		background-color: hsl(150, 1%, 10%);
+		background-color: hsl(from var(--bg) h s calc(l * 0.9));
 		overflow-y: scroll;
 		overflow-x: hidden;
 		white-space: break-word;
 		scrollbar-width: thin;
-		width: 100%;
-		height: 85svh;
+		height: 80svh;
 		border-radius: 0.3rem;
-		outline: 0.1rem solid transparent;
+		border: 1px solid transparent;
+		transition: border-color 0.25s;
 	}
 
 	.chatLog:hover {
-		outline: 0.1rem solid lightgrey;
+		border-color: var(--ac);
 	}
 </style>
