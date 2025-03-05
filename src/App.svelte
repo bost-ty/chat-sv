@@ -1,55 +1,58 @@
 <script>
-	import ChatLog from "./lib/ChatLog.svelte";
-	import { fade } from "svelte/transition";
+	import { SquarePlus } from "lucide-svelte";
+	import ChatManager from "./lib/ChatManager.svelte";
+	import { sharedState } from "./lib/state.svelte";
 
 	let targetChannel = $state("");
 	let value = $state("");
-	let isHovered = $state(false);
 
-	let channels = $state([]);
+	$inspect(sharedState.channels);
 
 	function handleSubmit(e) {
 		e.preventDefault();
+		const twitchUsernameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]{0,23}$/;
+		sharedState.formMessage = "";
+		if (!value || !twitchUsernameRegex.test(value)) {
+			sharedState.formMessage = "Please enter a valid Twitch channel username.";
+			value = "";
+			return;
+		}
 		targetChannel = value.toLowerCase();
-		channels.push(targetChannel);
+		if (sharedState.channels.includes(targetChannel)) {
+			sharedState.formMessage = `Already connected to ${targetChannel}!`;
+			value = "";
+			return;
+		}
+		sharedState.formMessage = `Connected to ${targetChannel}!`;
+		sharedState.channels.push(targetChannel);
 		value = "";
-	}
-
-	function disconnectChannel(channel) {
-		channels = channels.filter((ch) => ch !== channel);
 	}
 </script>
 
-<!-- This whole <section> could be extracted into a component and reused! -->
 <section>
 	<form onsubmit={handleSubmit}>
 		<label>Enter channel name: <input type="text" bind:value /> </label>
-		<button type="submit">Connect to channel</button>
+		<button type="submit"><SquarePlus size={20} />Connect to channel</button>
+		{#if sharedState.formMessage}
+			<span class="formMessage">
+				{sharedState.formMessage}
+			</span>
+		{/if}
 	</form>
 	<div class="chatsContainer">
-		{#each channels as targetChannel (targetChannel)}
-			<div class="chatManager">
-				<div
-					transition:fade={{ duration: 100 }}
-					style="display: flex; align-items: center; gap: 1rem;"
-				>
-					<h2>{targetChannel}</h2>
-					<button type="button" onclick={() => disconnectChannel(targetChannel)}
-						>Disconnect</button
-					>
-				</div>
-				<ChatLog {targetChannel} bind:isHovered />
-				{#if isHovered}
-					<div transition:fade={{ duration: 100 }} class="hoverMessage">
-						Scroll paused due to hover
-					</div>
-				{/if}
-			</div>
+		{#each sharedState.channels as targetChannel (targetChannel)}
+			<ChatManager {targetChannel} />
 		{/each}
 	</div>
 </section>
 
 <style>
+	button {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		gap: 0.3rem;
+	}
 	section {
 		position: relative;
 		height: 100%;
@@ -62,28 +65,12 @@
 		align-items: center;
 		margin-bottom: 1rem;
 	}
+	.formMessage {
+		margin-left: 1rem;
+	}
 	.chatsContainer {
 		display: flex;
 		flex-flow: row wrap;
-	}
-	.chatManager {
-		flex-shrink: 1;
-	}
-
-	.hoverMessage {
-		position: absolute;
-		bottom: 1rem;
-		left: 0;
-		right: 0;
-		background-color: hsl(150, 1%, 20%);
-		width: fit-content;
-		padding: 0.2rem 0.6rem;
-		margin-inline: auto;
-		text-align: center;
-		pointer-events: none;
-		outline: 1px solid lightgrey;
-		color: lightgrey;
-		border-radius: 0.3rem;
-		font-weight: 500;
+		gap: 1rem;
 	}
 </style>

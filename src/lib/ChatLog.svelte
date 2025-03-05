@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import { fade } from "svelte/transition";
+	import { onMount, onDestroy } from "svelte";
 	import ChatMessage from "./ChatMessage.svelte";
 	import { parseIrc, scrollBottom } from "./chat";
 
@@ -16,8 +15,10 @@
 		if (!isHovered && chats && messages) scrollBottom(chats);
 	});
 
+	let ws: WebSocket;
+
 	onMount(() => {
-		const ws = new WebSocket(TWITCH_IRC_WS);
+		ws = new WebSocket(TWITCH_IRC_WS);
 
 		ws.addEventListener("open", (e) => {
 			ws.send(`NICK ${NICKNAME}`);
@@ -25,6 +26,7 @@
 		});
 
 		ws.addEventListener("message", (e) => {
+			// Ignore self messages and pings
 			if (e.data.includes(NICKNAME) || e.data.includes("PING")) return;
 			messages.push(parseIrc(e.data));
 			if (!isHovered && chats) scrollBottom(chats);
@@ -33,11 +35,18 @@
 		ws.addEventListener("error", (e) => {
 			console.error(e);
 		});
+
+		ws.addEventListener("close", (e) => {
+			console.log(`WebSocket closed for ${targetChannel}`);
+		});
+	});
+
+	onDestroy(() => {
+		ws.close();
 	});
 </script>
 
 <div
-	transition:fade
 	id="chats"
 	class="chatLog"
 	role="list"
