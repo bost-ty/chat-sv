@@ -1,5 +1,5 @@
 <script>
-	import Chat from "./lib/Chat.svelte";
+	import ChatLog from "./lib/ChatLog.svelte";
 	import { fade } from "svelte/transition";
 
 	let targetChannel = $state("");
@@ -26,23 +26,25 @@
 		<label>Enter channel name: <input type="text" bind:value /> </label>
 		<button type="submit">Connect to channel</button>
 	</form>
-	<div>
+	<div class="chatsContainer">
 		{#each channels as targetChannel (targetChannel)}
-			<div
-				transition:fade={{ duration: 100 }}
-				style="display: flex; align-items: center; gap: 1rem;"
-			>
-				<h2>{targetChannel}</h2>
-				<button type="button" onclick={() => disconnectChannel(targetChannel)}
-					>Disconnect</button
+			<div class="chatManager">
+				<div
+					transition:fade={{ duration: 100 }}
+					style="display: flex; align-items: center; gap: 1rem;"
 				>
-			</div>
-			<Chat {targetChannel} bind:isHovered />
-			{#if isHovered}
-				<div transition:fade={{ duration: 100 }} class="hoverMessage">
-					Scroll paused due to hover
+					<h2>{targetChannel}</h2>
+					<button type="button" onclick={() => disconnectChannel(targetChannel)}
+						>Disconnect</button
+					>
 				</div>
-			{/if}
+				<ChatLog {targetChannel} bind:isHovered />
+				{#if isHovered}
+					<div transition:fade={{ duration: 100 }} class="hoverMessage">
+						Scroll paused due to hover
+					</div>
+				{/if}
+			</div>
 		{/each}
 	</div>
 </section>
@@ -59,6 +61,13 @@
 		gap: 1rem;
 		align-items: center;
 		margin-bottom: 1rem;
+	}
+	.chatsContainer {
+		display: flex;
+		flex-flow: row wrap;
+	}
+	.chatManager {
+		flex-shrink: 1;
 	}
 
 	.hoverMessage {

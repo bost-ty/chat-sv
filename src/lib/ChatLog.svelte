@@ -39,7 +39,7 @@
 <div
 	transition:fade
 	id="chats"
-	class="chats"
+	class="chatLog"
 	role="list"
 	bind:this={chats}
 	onmouseenter={() => (isHovered = true)}
@@ -51,7 +51,7 @@
 </div>
 
 <style>
-	.chats {
+	.chatLog {
 		padding: 0.1rem 0.3rem;
 		margin: 0;
 		background-color: hsl(150, 1%, 10%);
@@ -65,7 +65,7 @@
 		outline: 0.1rem solid transparent;
 	}
 
-	.chats:hover {
+	.chatLog:hover {
 		outline: 0.1rem solid lightgrey;
 	}
 </style>
