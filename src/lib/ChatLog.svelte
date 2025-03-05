@@ -20,7 +20,7 @@
 	onMount(() => {
 		ws = new WebSocket(TWITCH_IRC_WS);
 
-		ws.addEventListener("open", (e) => {
+		ws.addEventListener("open", (_e) => {
 			ws.send(`NICK ${NICKNAME}`);
 			ws.send(`JOIN #${targetChannel}`);
 		});
@@ -32,13 +32,11 @@
 			if (!isHovered && chats) scrollBottom(chats);
 		});
 
-		ws.addEventListener("error", (e) => {
-			console.error(e);
-		});
+		ws.addEventListener("error", (e) => console.error(e));
 
-		ws.addEventListener("close", (e) => {
-			console.log(`WebSocket closed for ${targetChannel}`);
-		});
+		ws.addEventListener("close", (_e) =>
+			console.log(`WebSocket closed for ${targetChannel}`)
+		);
 	});
 
 	onDestroy(() => {
