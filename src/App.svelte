@@ -1,5 +1,5 @@
 <script>
-	import { SquarePlus } from "lucide-svelte";
+	import { MessageSquarePlus } from "lucide-svelte";
 	import ChatManager from "./lib/ChatManager.svelte";
 	import { sharedState } from "./lib/state.svelte";
 
@@ -30,7 +30,7 @@
 <section>
 	<form onsubmit={handleSubmit}>
 		<label>Enter channel name: <input type="text" bind:value /> </label>
-		<button type="submit"><SquarePlus size={18} />Connect</button>
+		<button type="submit"><MessageSquarePlus size={18} />Connect</button>
 		{#if sharedState.formMessage}
 			<span class="formMessage">
 				{sharedState.formMessage}

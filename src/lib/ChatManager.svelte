@@ -1,5 +1,9 @@
 <script>
-	import { SquareMinus, Hand } from "lucide-svelte";
+	import {
+		MessageSquareOff,
+		SquareMousePointer,
+		SquareDashedMousePointer,
+	} from "lucide-svelte";
 	import ChatLog from "./ChatLog.svelte";
 	import { sharedState } from "./state.svelte";
 	let { targetChannel } = $props();
@@ -16,13 +20,18 @@
 	<div class="chatHeader">
 		<h2>{targetChannel}</h2>
 		<button type="button" onclick={() => disconnectChannel(targetChannel)}
-			><SquareMinus size={18} />Disconnect</button
+			><MessageSquareOff size={16} />Disconnect</button
 		>
 		<button
 			type="button"
 			onclick={() => {
 				pauseOnHover = !pauseOnHover;
-			}}><Hand size={18} />{pauseOnHover ? "P" : "Not p"}ausing on hover</button
+			}}
+			>{#if pauseOnHover}<SquareMousePointer
+					size={18}
+				/>{:else}<SquareDashedMousePointer size={18} />{/if}{pauseOnHover
+				? "P"
+				: "Not p"}ausing on hover</button
 		>
 	</div>
 	<ChatLog {targetChannel} {pauseOnHover} />

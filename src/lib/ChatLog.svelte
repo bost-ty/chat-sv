@@ -49,7 +49,7 @@
 
 <div
 	id="chats"
-	class="chatLog"
+	class="chatLog {pauseOnHover ? '' : 'noPause'}"
 	role="list"
 	bind:this={chats}
 	onmouseenter={() => (isHovered = true)}
@@ -79,15 +79,16 @@
 		--sp: hsl(from var(--ac) h s calc(l * 0.8));
 		--spa: hsla(from var(--sp) h s l / 20%);
 		scrollbar-width: thin;
-		scrollbar-color: var(--spa) transparent;
+		scrollbar-color: var(--spa) hsla(from var(--spa) h s l / 5%);
 		transition: border-color 100ms linear;
 	}
-
 	.chatLog:hover {
 		border-color: var(--sp);
 		scrollbar-color: var(--sp) var(--spa);
 	}
-
+	.noPause:hover {
+		border-color: hsla(from var(--spa) h s l / 20%);
+	}
 	.hoverMessage {
 		position: absolute;
 		bottom: 2rem;
