@@ -59,7 +59,7 @@
 		text-align: center;
 		background-color: var(--bg);
 		border: 1px solid var(--ac);
-		color: var(--ac);
+		color: var(--fg);
 		pointer-events: none;
 	}
 </style>

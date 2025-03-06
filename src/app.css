@@ -47,12 +47,12 @@ input {
 	font-family: inherit;
 	color: inherit;
 	background-color: hsl(from var(--bg) h calc(s * 1.7) calc(l * 1.6));
-	transition: border-color 0.25s;
+	transition: border-color 100ms linear;
 }
 
 button {
 	cursor: pointer;
-	border-radius: 0.4rem;
+	border-radius: 0.1em;
 }
 
 input {
