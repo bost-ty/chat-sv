@@ -5,10 +5,11 @@
  */
 
 export function parseIrc(ircMessage) {
+	console.log(ircMessage);
 	const d = new Date();
 	const date = d.toLocaleTimeString("en-US", { hourCycle: "h23" }).slice(0, 10);
 	const username = ircMessage.split("!")[0].slice(1)?.trim();
-	const message = ircMessage.split(":")[2]?.trim();
+	const message = ircMessage.split(":").slice(2).join(":")?.trim();
 	return { date, username, message };
 }
 /**
@@ -16,9 +17,11 @@ export function parseIrc(ircMessage) {
  * @param {HTMLElement} element
  */
 export function scrollBottom(element) {
+	// Uses a timeout of 0ms to defer until end of render cycle,
+	// But there are also some $effect.pre things in Svelte 5 too.
 	setTimeout(() => {
 		element.scrollTop = element.scrollHeight - element.clientHeight;
-	}, 0); // Uses a timeout of 0ms to defer until end of render cycle
+	}, 0);
 }
 
 /**
