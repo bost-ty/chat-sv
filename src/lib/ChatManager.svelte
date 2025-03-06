@@ -7,6 +7,8 @@
 
 	let isHovered = $state(false);
 
+	let pauseOnHover = $state(true);
+
 	function disconnectChannel(channel) {
 		sharedState.channels = sharedState.channels.filter((ch) => ch !== channel);
 		sharedState.formMessage = `Disconnected from ${channel}.`;
@@ -19,6 +21,7 @@
 		<button type="button" onclick={() => disconnectChannel(targetChannel)}
 			><SquareMinus size={18} />Disconnect</button
 		>
+		<button type="button" onclick={() => {}}>Pause on hover</button>
 	</div>
 	<ChatLog {targetChannel} bind:isHovered />
 	{#if isHovered}
@@ -57,7 +60,7 @@
 		width: fit-content;
 		margin-inline: auto;
 		text-align: center;
-		background-color: var(--bg);
+		background-color: var(--int);
 		border: 1px solid var(--ac);
 		color: var(--fg);
 		pointer-events: none;

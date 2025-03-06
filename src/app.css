@@ -5,6 +5,7 @@
 
 	--fg: hsl(220 4 83);
 	--bg: hsl(220 4 14);
+	--int: hsl(from var(--bg) h calc(s * 1.7) calc(l * 1.6));
 	--ac: hsl(from var(--fg) h calc(s * 3) calc(l * 0.8));
 
 	color-scheme: dark light;
@@ -46,7 +47,7 @@ input {
 	padding: 0.4rem 1rem;
 	font-family: inherit;
 	color: inherit;
-	background-color: hsl(from var(--bg) h calc(s * 1.7) calc(l * 1.6));
+	background-color: var(--int);
 	transition: border-color 100ms linear;
 }
 
