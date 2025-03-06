@@ -64,6 +64,11 @@ button:hover,
 input:hover {
 	border-color: var(--ac);
 }
+
+button:active {
+	transform: scale(0.95);
+	background-color: var(--bg);
+}
 button:focus,
 button:focus-visible,
 input:focus,

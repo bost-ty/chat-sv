@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { fade } from "svelte/transition";
 	import { onMount, onDestroy } from "svelte";
 	import ChatMessage from "./ChatMessage.svelte";
 	import { parseIrc, scrollBottom } from "./chat";
 
-	let { isHovered = $bindable(), targetChannel } = $props();
+	let { targetChannel, pauseOnHover } = $props();
+	let isHovered = $state(false);
 
 	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
 	const NICKNAME = "justinfan1337";
@@ -12,6 +14,7 @@
 	let messages = $state([]);
 
 	$effect(() => {
+		if (!pauseOnHover) isHovered = false;
 		if (!isHovered && chats && messages) scrollBottom(chats);
 	});
 
@@ -55,6 +58,11 @@
 	{#each messages as { time, username, message }}
 		<ChatMessage {time} {username} {message} />
 	{/each}
+	{#if isHovered && pauseOnHover}
+		<div transition:fade={{ duration: 100 }} class="hoverMessage">
+			Scroll paused due to hover
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -78,5 +86,20 @@
 	.chatLog:hover {
 		border-color: var(--sp);
 		scrollbar-color: var(--sp) var(--spa);
+	}
+
+	.hoverMessage {
+		position: absolute;
+		bottom: 2rem;
+		left: 0;
+		right: 0;
+		border-radius: 0.1rem;
+		padding: 0.6rem 1.2rem;
+		width: fit-content;
+		margin-inline: auto;
+		text-align: center;
+		background-color: var(--int);
+		border: 1px solid var(--ac);
+		color: var(--fg);
 	}
 </style>
