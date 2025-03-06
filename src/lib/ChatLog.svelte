@@ -60,19 +60,23 @@
 <style>
 	.chatLog {
 		padding: 0.1rem 0.3rem;
+		border-radius: 0.1rem;
 		margin: 0;
 		background-color: hsl(from var(--bg) h s calc(l * 0.9));
 		overflow-y: scroll;
 		overflow-x: hidden;
 		white-space: break-word;
-		scrollbar-width: thin;
 		height: 80svh;
-		border-radius: 0.3rem;
 		border: 1px solid transparent;
-		transition: border-color 0.25s;
+		--sp: hsl(from var(--ac) h s calc(l * 0.8));
+		--spa: hsla(from var(--sp) h s l / 20%);
+		scrollbar-width: thin;
+		scrollbar-color: var(--spa) transparent;
+		transition: border-color 100ms linear;
 	}
 
 	.chatLog:hover {
-		border-color: var(--ac);
+		border-color: var(--sp);
+		scrollbar-color: var(--sp) var(--spa);
 	}
 </style>

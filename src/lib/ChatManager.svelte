@@ -49,17 +49,17 @@
 
 	.hoverMessage {
 		position: absolute;
-		bottom: 1rem;
+		bottom: 2rem;
 		left: 0;
 		right: 0;
-		border-radius: 0.3rem;
-		padding: 0.2rem 0.6rem;
+		border-radius: 0.1rem;
+		padding: 0.6rem 1.2rem;
 		width: fit-content;
 		margin-inline: auto;
 		text-align: center;
-		font-weight: 500;
 		background-color: var(--bg);
-		outline: 1px solid var(--ac);
+		border: 1px solid var(--ac);
+		color: var(--ac);
 		pointer-events: none;
 	}
 </style>
