@@ -25,7 +25,6 @@
 	};
 
 	$effect(() => {
-		console.log("$effect");
 		if (!pauseChatScroll) scrollToBottom();
 	});
 
