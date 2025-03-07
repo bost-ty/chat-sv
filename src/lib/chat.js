@@ -1,16 +1,14 @@
 /**
  *
  * @param {string} ircMessage
- * @returns {{date: string, username: string, message: string}}
+ * @returns {{timestamp: Date, username: string, message: string}}
  */
 
 export function parseIrc(ircMessage) {
-	console.log(ircMessage);
-	const d = new Date();
-	const date = d.toLocaleTimeString("en-US", { hourCycle: "h23" }).slice(0, 10);
+	const timestamp = new Date();
 	const username = ircMessage.split("!")[0].slice(1)?.trim();
 	const message = ircMessage.split(":").slice(2).join(":")?.trim();
-	return { date, username, message };
+	return { timestamp, username, message };
 }
 /**
  * Scroll an element to its bottom *after render*.

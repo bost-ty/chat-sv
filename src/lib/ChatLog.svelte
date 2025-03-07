@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { fade } from "svelte/transition";
 	import { onMount, onDestroy } from "svelte";
+
 	import ChatMessage from "./ChatMessage.svelte";
+
 	import { parseIrc, scrollBottom } from "./chat";
 
-	let { targetChannel, pauseOnHover } = $props();
+	let { targetChannel, pauseOnHover, messages = $bindable() } = $props();
 	let isHovered = $state(false);
 
 	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
 	const NICKNAME = "justinfan1337";
 
-	let chats: HTMLDivElement;
-	let messages = $state([]);
+	let chats: HTMLDivElement; // Binding for the `chats` div in this component
 
 	$effect(() => {
 		if (!pauseOnHover) isHovered = false;
@@ -26,13 +27,16 @@
 		ws.addEventListener("open", (_e) => {
 			ws.send(`NICK ${NICKNAME}`);
 			ws.send(`JOIN #${targetChannel}`);
+			console.log(`WebSocket opened for ${targetChannel}`);
 		});
 
 		ws.addEventListener("message", (e) => {
-			// Ignore self messages and pings
-			if (e.data.includes(NICKNAME) || e.data.includes("PING")) return;
+			// Ignore self messages & handle pings
+			if (e.data.includes(NICKNAME)) return;
+			if (e.data.includes("PING")) ws.send(`PONG ${e.data}`);
+
 			messages.push(parseIrc(e.data));
-			if (!isHovered && chats) scrollBottom(chats);
+			if (!isHovered && chats && messages) scrollBottom(chats);
 		});
 
 		ws.addEventListener("error", (e) => console.error(e));
@@ -55,8 +59,8 @@
 	onmouseenter={() => (isHovered = true)}
 	onmouseleave={() => (isHovered = false)}
 >
-	{#each messages as { time, username, message }}
-		<ChatMessage {time} {username} {message} />
+	{#each messages as { timestamp, username, message }}
+		<ChatMessage {timestamp} {username} {message} />
 	{/each}
 	{#if isHovered && pauseOnHover}
 		<div transition:fade={{ duration: 100 }} class="hoverMessage">

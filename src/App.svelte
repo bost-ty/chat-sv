@@ -29,7 +29,14 @@
 
 <section>
 	<form onsubmit={handleSubmit}>
-		<label>Enter channel name: <input type="text" bind:value /> </label>
+		<label
+			>Enter channel name: <input
+				id="channelInput"
+				type="text"
+				bind:value
+				autocomplete="off"
+			/>
+		</label>
 		<button type="submit"><MessageSquarePlus size={18} />Connect</button>
 		{#if sharedState.formMessage}
 			<span class="formMessage">

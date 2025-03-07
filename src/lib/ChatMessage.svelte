@@ -1,6 +1,7 @@
 <script>
 	import { stringToHslColor } from "./chat";
-	let { time, username, message } = $props();
+	let { timestamp, username, message } = $props();
+	let time = timestamp.toLocaleTimeString("en-US", { hourCycle: "h23" }).slice(0, 10);
 </script>
 
 <div>
@@ -17,8 +18,8 @@
 		line-height: 1.3;
 	}
 	.time {
-		font-size: 0.9rem;
-		color: lightgrey;
+		font-size: 0.7rem;
+		color: var(--ac);
 		padding-right: 0.1rem;
 	}
 	.username {
