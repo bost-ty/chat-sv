@@ -26,13 +26,19 @@
 		const chatRateTimer = setInterval(() => {
 			chatRate;
 		}, 1000);
-
 		return () => clearInterval(chatRateTimer);
 	});
 
 	function disconnectChannel(channel) {
 		sharedState.channels = sharedState.channels.filter((ch) => ch !== channel);
 		sharedState.formMessage = `Disconnected from ${channel}.`;
+		const url = new URL(window.location.href);
+		if (sharedState.channels.length === 0) {
+			url.searchParams.delete("channels");
+		} else {
+			url.searchParams.set("channels", sharedState.channels.join("-"));
+		}
+		history.pushState({}, "", url.href);
 	}
 </script>
 

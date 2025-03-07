@@ -4,12 +4,10 @@
 	import { sharedState } from "./lib/state.svelte";
 
 	// Load and connect to channels from URL
-	// https://example.com/?channel=MyChannelName&channel=YourChannelName
+	// https://example.com/?channels=MyChannelName,YourChannelName
 	const url = new URL(window.location.href);
-	const sp = url.searchParams;
-	if (sp.has("channel")) {
-		sharedState.channels = sp.getAll("channel");
-	}
+	const channelState = url.searchParams.get("channels");
+	sharedState.channels = channelState ? channelState.split("-") : [];
 
 	let targetChannel = $state("");
 	let value = $state("");
@@ -31,7 +29,7 @@
 		}
 		sharedState.formMessage = `Connected to ${targetChannel}!`;
 		sharedState.channels.push(targetChannel);
-		sp.append("channel", targetChannel);
+		url.searchParams.set("channels", sharedState.channels.join("-"));
 		history.pushState({}, "", url.href);
 		value = "";
 	}
