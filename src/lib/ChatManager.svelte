@@ -63,7 +63,7 @@
 
 <style>
 	h2 {
-		font-size: clamp(0.5rem, 0.5rem + 1vw, 1rem);
+		font-size: clamp(0.8rem, 0.8rem + 1svw, 1.2rem);
 	}
 	button {
 		display: flex;

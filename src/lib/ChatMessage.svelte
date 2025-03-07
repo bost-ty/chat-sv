@@ -16,7 +16,7 @@
 		padding: 0;
 		margin: 0.1rem 0;
 		line-height: 1.3;
-		max-width: 40ch;
+		max-width: 50ch;
 	}
 	.time {
 		font-size: 0.7rem;
