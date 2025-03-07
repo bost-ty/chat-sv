@@ -3,6 +3,14 @@
 	import ChatManager from "./lib/ChatManager.svelte";
 	import { sharedState } from "./lib/state.svelte";
 
+	// Load and connect to channels from URL
+	// https://example.com/?channel=MyChannelName&channel=YourChannelName
+	const url = new URL(window.location.href);
+	const sp = url.searchParams;
+	if (sp.has("channel")) {
+		sharedState.channels = sp.getAll("channel");
+	}
+
 	let targetChannel = $state("");
 	let value = $state("");
 
@@ -23,6 +31,8 @@
 		}
 		sharedState.formMessage = `Connected to ${targetChannel}!`;
 		sharedState.channels.push(targetChannel);
+		sp.append("channel", targetChannel);
+		history.pushState({}, "", url.href);
 		value = "";
 	}
 </script>
