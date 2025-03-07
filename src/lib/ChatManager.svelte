@@ -78,6 +78,7 @@
 		position: relative;
 		flex: 1 0 36%;
 		max-width: 49%;
+		min-width: fit-content;
 	}
 
 	.chatHeader {
