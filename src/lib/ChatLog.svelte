@@ -1,22 +1,33 @@
 <script lang="ts">
-	import { onMount, onDestroy } from "svelte";
+	import { onMount, onDestroy, tick } from "svelte";
 	import { fade } from "svelte/transition";
 
 	import ChatMessage from "./ChatMessage.svelte";
 
-	import { parseIrc, scrollBottom } from "./chat";
+	import { parseIrc } from "./chat";
 
 	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
 	const NICKNAME = "justinfan1337";
 
-	let { targetChannel, pauseOnHover, messages = $bindable() } = $props();
-	let isHovered = $state(false);
-
 	let chats: HTMLDivElement; // Binding for the `chats` div in this component
 
+	let { targetChannel, pauseOnHover, messages = $bindable() } = $props();
+	let isHovered = $state(false); // "Are we hovering the chat?"
+	/* pauseOnHover // "Should we care about hovering the chat?" */
+	// "Should we pause chat scroll?"
+	let pauseChatScroll = $derived.by(() => {
+		if (!pauseOnHover) return false;
+		if (isHovered) return true;
+	});
+
+	const scrollToBottom = () => {
+		chats.scrollTop = chats.scrollHeight - chats.clientHeight;
+		console.log("scrollToBottom");
+	};
+
 	$effect(() => {
-		if (!pauseOnHover) isHovered = false;
-		if (!isHovered && chats && messages) scrollBottom(chats);
+		console.log("$effect");
+		if (!pauseChatScroll) scrollToBottom();
 	});
 
 	let ws: WebSocket;
@@ -35,7 +46,7 @@
 			if (e.data.includes(NICKNAME)) return;
 			if (e.data.includes("PING")) ws.send(`PONG ${e.data}`);
 			messages.push(parseIrc(e.data));
-			if (!isHovered && chats && messages) scrollBottom(chats);
+			if (!pauseChatScroll) tick().then(() => scrollToBottom());
 		});
 
 		ws.addEventListener("error", (e) => console.error(e));

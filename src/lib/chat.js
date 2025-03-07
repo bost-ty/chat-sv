@@ -11,18 +11,6 @@ export function parseIrc(ircMessage) {
 }
 
 /**
- * Scroll an element to its bottom *after render*.
- * @param {HTMLElement} element
- */
-export function scrollBottom(element) {
-	// Uses a timeout of 0ms to defer until end of render cycle,
-	// But there are also some $effect.pre things in Svelte 5 too.
-	setTimeout(() => {
-		element.scrollTop = element.scrollHeight - element.clientHeight;
-	}, 0);
-}
-
-/**
  * Turn any given string into the same number every time.
  * @param {string} string
  * @returns {number}
