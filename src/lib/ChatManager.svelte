@@ -16,8 +16,8 @@
 
 	const getRate = () => {
 		const now = Date.now();
-		const intervalAgo = now - intervalS * 1000;
-		return messages.filter((msg) => msg.timestamp > intervalAgo).length;
+		const intervalMsAgo = now - intervalS * 1000;
+		return messages.filter((msg) => msg.timestamp > intervalMsAgo).length;
 	};
 
 	let chatRate = $derived.by(getRate);

@@ -22,7 +22,6 @@
 
 	const scrollToBottom = () => {
 		chats.scrollTop = chats.scrollHeight - chats.clientHeight;
-		console.log("scrollToBottom");
 	};
 
 	$effect(() => {
