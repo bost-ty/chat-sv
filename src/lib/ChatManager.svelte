@@ -54,7 +54,7 @@
 				: "Scroll"} on hover</button
 		>
 		<div class="chatRate">
-			{chatRate} chats per
+			<span class="rn">{chatRate}</span>&nbsp;chats per
 			<input type="number" min="1" step="1" max="60" bind:value={intervalS} /> s.
 		</div>
 	</div>
@@ -92,5 +92,11 @@
 		flex-flow: row nowrap;
 		align-items: center;
 		flex-shrink: 0;
+		width: 12rem;
+	}
+	.rn {
+		font-family: monospace;
+		width: fit-content;
+		text-align: center;
 	}
 </style>
