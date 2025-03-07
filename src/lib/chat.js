@@ -3,13 +3,13 @@
  * @param {string} ircMessage
  * @returns {{timestamp: Date, username: string, message: string}}
  */
-
 export function parseIrc(ircMessage) {
 	const timestamp = new Date();
 	const username = ircMessage.split("!")[0].slice(1)?.trim();
 	const message = ircMessage.split(":").slice(2).join(":")?.trim();
 	return { timestamp, username, message };
 }
+
 /**
  * Scroll an element to its bottom *after render*.
  * @param {HTMLElement} element

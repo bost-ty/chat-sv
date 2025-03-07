@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { fade } from "svelte/transition";
 	import { onMount, onDestroy } from "svelte";
+	import { fade } from "svelte/transition";
 
 	import ChatMessage from "./ChatMessage.svelte";
 
 	import { parseIrc, scrollBottom } from "./chat";
 
-	let { targetChannel, pauseOnHover, messages = $bindable() } = $props();
-	let isHovered = $state(false);
-
 	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
 	const NICKNAME = "justinfan1337";
+
+	let { targetChannel, pauseOnHover, messages = $bindable() } = $props();
+	let isHovered = $state(false);
 
 	let chats: HTMLDivElement; // Binding for the `chats` div in this component
 
@@ -34,7 +34,6 @@
 			// Ignore self messages & handle pings
 			if (e.data.includes(NICKNAME)) return;
 			if (e.data.includes("PING")) ws.send(`PONG ${e.data}`);
-
 			messages.push(parseIrc(e.data));
 			if (!isHovered && chats && messages) scrollBottom(chats);
 		});
