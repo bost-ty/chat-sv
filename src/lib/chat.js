@@ -20,6 +20,22 @@ function hashStringToNumber(string) {
 }
 
 /**
+ * Create a more divergent number via hashing a string.
+ * @param {string} string
+ * @returns {number}
+ */
+function divergentStringToNumber(string) {
+	let hash = 0;
+	for (let i = 0; i < string.length; i++) {
+		hash = (hash << 5) - hash + string.charCodeAt(i);
+		hash |= 0;
+
+	}
+	return Math.abs(hash);
+}
+
+
+/**
  * Deterministically turn a given string into a valid hsl() CSS color.
  * @param {string} string
  * @returns {string} hsl(h s l)
@@ -31,3 +47,17 @@ export function stringToHslColor(string) {
 	let l = "50%";
 	return `hsl(${h} ${s} ${l})`;
 }
+
+/**
+ * Deterministically turn a given string into a valid oklch() CSS color.
+ * @param {string} string
+ * @returns {string} oklch(l% c h)
+ */
+export function stringToOklchColor(string) {
+	let stringHash = divergentStringToNumber(string);
+	let h = stringHash % 361; // Put stringHash between 0 and 360 for the hue value
+	let c = "0.2"
+	let l = "55%";
+	return `oklch(${l} ${c} ${h})`;
+}
+

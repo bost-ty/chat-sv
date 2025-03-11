@@ -3,10 +3,10 @@
 	line-height: 1.5;
 	font-weight: 400;
 
-	--fg: hsl(220 4 83);
-	--bg: hsl(220 4 14);
-	--int: hsl(from var(--bg) h calc(s * 1.7) calc(l * 1.6));
-	--ac: hsl(from var(--fg) h calc(s * 3) calc(l * 0.8));
+	--fg: oklch(86% .0034 264); /* light */
+	--bg: oklch(25% .0032 264); /* dark */
+	--int: oklch(from var(--bg) calc(l * 1.4) c h);
+	--ac: oklch(from var(--fg) calc(l * 0.85) c h);
 
 	color-scheme: dark light;
 
@@ -21,8 +21,8 @@
 
 @media (prefers-color-scheme: light) {
 	:root {
-		--fg: hsl(220 4 14);
-		--bg: hsl(220 4 83);
+		--fg: oklch(25% .0032 264);
+		--bg: oklch(86% .0034 264);
 	}
 }
 
