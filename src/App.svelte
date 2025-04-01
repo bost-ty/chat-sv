@@ -1,23 +1,23 @@
-<script>
+<script lang="ts">
 	import { MessageSquarePlus } from "lucide-svelte";
 	import ChatManager from "./lib/ChatManager.svelte";
 	import { sharedState } from "./lib/state.svelte";
+	import { getChannelsFromQueryParams } from "./utils/params";
 
-	// Load and connect to channels from URL
-	// https://example.com/?channels=MyChannelName,YourChannelName
 	const url = new URL(window.location.href);
-	const channelState = url.searchParams.get("channels");
+	const channelState = getChannelsFromQueryParams(window.location.href);
 	sharedState.channels = channelState ? channelState.split("-") : [];
 
 	let targetChannel = $state("");
 	let value = $state("");
 
-	function handleSubmit(e) {
+	function handleSubmit(e: Event) {
 		e.preventDefault();
 		const twitchUsernameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]{0,23}$/;
 		sharedState.formMessage = "";
 		if (!value || !twitchUsernameRegex.test(value)) {
-			sharedState.formMessage = "Please enter a valid Twitch channel username.";
+			sharedState.formMessage =
+				"Please enter a valid Twitch channel username.";
 			value = "";
 			return;
 		}
