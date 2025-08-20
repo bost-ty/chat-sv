@@ -83,8 +83,7 @@
 		margin-top: 0.3rem;
 		position: relative;
 		flex: 1 0 36%;
-		max-width: 49%;
-		min-width: fit-content;
+		max-width: 49dvw;
 	}
 
 	.chatHeader {
