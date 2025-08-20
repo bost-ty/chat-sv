@@ -5,6 +5,7 @@
 	import ChatMessage from "./ChatMessage.svelte";
 
 	import { parseIrc } from "./chat";
+	import { sharedState } from "./state.svelte";
 
 	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
 	const NICKNAME = "justinfan1337";
@@ -37,6 +38,7 @@
 			ws.send(`NICK ${NICKNAME}`);
 			ws.send(`JOIN #${targetChannel}`);
 			console.log(`WebSocket opened for ${targetChannel}`);
+			sharedState.formMessage = `WebSocket opened for ${targetChannel}`;
 		});
 
 		ws.addEventListener("message", (e) => {
@@ -49,9 +51,10 @@
 
 		ws.addEventListener("error", (e) => console.error(e));
 
-		ws.addEventListener("close", (_e) =>
-			console.log(`WebSocket closed for ${targetChannel}`)
-		);
+		ws.addEventListener("close", (_e) => {
+			console.log(`WebSocket closed for ${targetChannel}`);
+			sharedState.formMessage = `WebSocket closed for ${targetChannel}`;
+		});
 	});
 
 	onDestroy(() => {
@@ -82,7 +85,7 @@
 		padding: 0.1rem 0.3rem;
 		border-radius: 0.1rem;
 		margin: 0;
-		background-color: hsl(from var(--bg) h s calc(l * 0.9));
+		background-color: hsl(from var(--bg) h s calc(l * 0.8));
 		overflow-y: scroll;
 		overflow-x: hidden;
 		white-space: break-word;

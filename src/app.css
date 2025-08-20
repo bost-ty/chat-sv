@@ -26,12 +26,18 @@
 	}
 }
 
+html {
+	scrollbar-gutter: stable;
+	overflow: hidden;
+}
+
 * {
 	box-sizing: border-box;
 }
 
 body {
 	font-size: 1rem;
+	margin: 0;
 }
 
 h1,

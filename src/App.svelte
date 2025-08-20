@@ -76,9 +76,21 @@
 		display: flex;
 		gap: 1rem;
 		align-items: center;
+		background-color: hsla(from var(--bg) h calc(s * 1.2) calc(l * 0.9));
+		padding: 0.3rem 0.6rem;
 	}
 	.chatsContainer {
 		display: flex;
 		flex-flow: row wrap;
+		align-items: start;
+		overflow-x: hidden;
+		height: 100%;
+		min-height: 100svh;
+	}
+	.formMessage {
+		line-height: 1;
+		text-align: center;
+		margin-left: auto;
+		color: var(--ac);
 	}
 </style>
