@@ -99,6 +99,11 @@
 		flex-shrink: 0;
 		width: 12rem;
 	}
+
+	.chatRate input[type=number] {
+		width: 2ch;
+	}
+	
 	.rn {
 		font-family: monospace;
 		width: fit-content;
