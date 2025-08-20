@@ -60,8 +60,7 @@
 				: "Scroll"} on hover</button
 		>
 		<div class="chatRate">
-			<span class="rn">{chatRate}</span>&nbsp;chats per
-			<input type="number" min="1" step="1" max="60" bind:value={intervalS} /> s.
+			<span class="rn">{chatRate}</span>&nbsp;chats per&nbsp;<input type="number" min="1" step="1" max="60" bind:value={intervalS} />&nbsp;s.
 		</div>
 	</div>
 	<ChatLog {targetChannel} {pauseOnHover} bind:messages />
@@ -101,6 +100,8 @@
 	}
 
 	.chatRate input[type=number] {
+		padding: 0;
+		margin: 0;
 		width: 2ch;
 	}
 	
