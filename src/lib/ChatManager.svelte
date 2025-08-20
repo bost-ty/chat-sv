@@ -14,8 +14,9 @@
 	let intervalS = $state(15);
 	let messages = $state([]);
 
+	let now = $state(Date.now());
+
 	const getRate = () => {
-		const now = Date.now();
 		const intervalMsAgo = now - intervalS * 1000;
 		return messages.filter((msg) => msg.timestamp > intervalMsAgo).length;
 	};
@@ -23,10 +24,10 @@
 	let chatRate = $derived.by(getRate);
 
 	$effect(() => {
-		const chatRateTimer = setInterval(() => {
-			chatRate;
+		const nowUpdateInterval = setInterval(() => {
+			now = Date.now();
 		}, 1000);
-		return () => clearInterval(chatRateTimer);
+		return () => clearInterval(nowUpdateInterval);
 	});
 
 	function disconnectChannel(channel) {
