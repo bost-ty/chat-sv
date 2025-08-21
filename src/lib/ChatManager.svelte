@@ -2,32 +2,38 @@
 	import {
 		MessageSquareOff,
 		SquareMousePointer,
-		SquareDashedMousePointer,
+		SquareDashedMousePointer
 	} from "lucide-svelte";
+	import { onMount, onDestroy } from "svelte";
 
 	import ChatLog from "./ChatLog.svelte";
-
+	import { parseIrc } from "./chat";
 	import { sharedState } from "./state.svelte";
-	let { targetChannel } = $props();
+
+	interface Message {
+		timestamp: Date;
+		username: string;
+		message: string;
+	}
+
+	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
+	const NICKNAME = "justinfan1337";
+
+	let { targetChannel }: { targetChannel: string } = $props();
 
 	let pauseOnHover = $state(true);
 	let intervalS = $state(15);
-	let messages = $state([]);
+	let messages = $state<Message[]>([]);
 
 	let now = $state(Date.now());
 
 	const getRate = () => {
 		const intervalMsAgo = now - intervalS * 1000;
-		return messages.filter((msg) => msg.timestamp > intervalMsAgo).length;
+		return messages.filter((msg) => msg.timestamp.getTime() > intervalMsAgo).length;
 	};
 
 	let chatRate = $derived.by(getRate);
 
-	/**
-	 * Update the chatRate every second,
-	 * rather than every new chat or every `chatRate` seconds,
-	 * to allow the rate to go down when messages aren't arriving.
-	 */
 	$effect(() => {
 		const nowUpdateInterval = setInterval(() => {
 			now = Date.now();
@@ -36,9 +42,7 @@
 	});
 
 	function disconnectChannel(channel: string) {
-		sharedState.channels = sharedState.channels.filter(
-			(ch) => ch !== channel,
-		);
+		sharedState.channels = sharedState.channels.filter((ch) => ch !== channel);
 		sharedState.formMessage = `Disconnected from ${channel}.`;
 		const url = new URL(window.location.href);
 		if (sharedState.channels.length === 0) {
@@ -48,6 +52,41 @@
 		}
 		history.pushState({}, "", url.href);
 	}
+
+	let ws: WebSocket;
+
+	onMount(() => {
+		ws = new WebSocket(TWITCH_IRC_WS);
+
+		ws.addEventListener("open", () => {
+			ws.send(`NICK ${NICKNAME}`);
+			ws.send(`JOIN #${targetChannel}`);
+			console.log(`WebSocket opened for ${targetChannel}`);
+			sharedState.formMessage = `WebSocket opened for ${targetChannel}`;
+		});
+
+		ws.addEventListener("message", (e) => {
+			if (e.data.includes(NICKNAME)) return;
+			if (e.data.includes("PING")) {
+				ws.send(`PONG ${e.data}`);
+				return;
+			}
+			messages.push(parseIrc(e.data));
+		});
+
+		ws.addEventListener("error", (e) => console.error(e));
+
+		ws.addEventListener("close", () => {
+			console.log(`WebSocket closed for ${targetChannel}`);
+			sharedState.formMessage = `WebSocket closed for ${targetChannel}`;
+		});
+	});
+
+	onDestroy(() => {
+		if (ws) {
+			ws.close();
+		}
+	});
 </script>
 
 <div class="chatManager">
@@ -56,38 +95,29 @@
 			<h2>
 				{targetChannel}
 			</h2>
-				<button
-					type="button"
-					onclick={() => disconnectChannel(targetChannel)}
-					>
+			<button type="button" onclick={() => disconnectChannel(targetChannel)}>
 				<MessageSquareOff size={16} />Disconnect</button
-				>
-				<button
-					type="button"
-					onclick={() => {
-						pauseOnHover = !pauseOnHover;
-					}}
-					>
-					{#if pauseOnHover}
-						<SquareMousePointer size={18} />
-					{:else}
-						<SquareDashedMousePointer size={18} />
-					{/if}
-					{pauseOnHover ? "Hold" : "Scroll"} on hover
-				</button >
-			</div>
-			<div class="chatRate">
-				<span class="rn">{chatRate}</span>&nbsp;chats per
-				<input
-					type="number"
-					min="1"
-					step="1"
-					max="60"
-					bind:value={intervalS}
-				/> s.
-			</div>
+			>
+			<button
+				type="button"
+				onclick={() => {
+					pauseOnHover = !pauseOnHover;
+				}}
+			>
+				{#if pauseOnHover}
+					<SquareMousePointer size={18} />
+				{:else}
+					<SquareDashedMousePointer size={18} />
+				{/if}
+				{pauseOnHover ? "Hold" : "Scroll"} on hover
+			</button>
 		</div>
-	<ChatLog {targetChannel} {pauseOnHover} bind:messages />
+		<div class="chatRate">
+			<span class="rn">{chatRate}</span>&nbsp;chats per
+			<input type="number" min="1" step="1" max="60" bind:value={intervalS} /> s.
+		</div>
+	</div>
+	<ChatLog {pauseOnHover} bind:messages />
 </div>
 
 <style>
@@ -129,14 +159,15 @@
 		align-items: center;
 		flex-shrink: 0;
 	}
-	.chatRate input[type=number] {
+	.chatRate input[type="number"] {
 		width: 3ch;
 		text-align: center;
 		margin-inline: 0.1em;
 		appearance: none;
 		border: none;
 
-		&::-webkit-outer-spin-button, &::-webkit-inner-spin-button {
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
 			-webkit-appearance: none;
 			margin: 0;
 		}

@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { onMount, onDestroy } from "svelte";
+	import { onMount } from "svelte";
 	import { fade } from "svelte/transition";
 	import type { Attachment } from "svelte/attachments";
 
 	import ChatMessage from "./ChatMessage.svelte";
-	import { parseIrc } from "./chat";
-	import { sharedState } from "./state.svelte";
 
 	interface Message {
 		timestamp: Date;
@@ -14,17 +12,13 @@
 	}
 
 	let {
-		targetChannel,
 		pauseOnHover,
 		messages = $bindable()
 	}: {
-		targetChannel: string;
 		pauseOnHover: boolean;
 		messages: Message[];
 	} = $props();
 
-	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
-	const NICKNAME = "justinfan1337";
 	const ESTIMATED_HEIGHT = 28; // px
 	const OVERSCAN_COUNT = 10;
 
@@ -33,17 +27,13 @@
 	let clientHeight = $state(0);
 	let scrollTop = $state(0);
 	let isHovered = $state(false);
-	let shouldScrollToBottom = $state(true);
+	let previousMessagesLength = $state(messages.length);
 
-	let scrollAdjustment = $state(0); // Testing the $effect.pre answer...
+	let scrollAdjustment = $state(0);
 
 	let pauseChatScroll = $derived(pauseOnHover && isHovered);
-
-	// The cache of measured heights. This is the only place where heights are written to.
 	let measuredHeights = $state(new Map<Message, number>());
 
-	// This derived value declaratively calculates the position of every item and the total height.
-	// It's a pure function, re-running only when `messages` or `measuredHeights` change.
 	const itemsWithPositions = $derived.by(() => {
 		let currentTop = 0;
 		const items = [];
@@ -55,13 +45,10 @@
 		return { items, totalHeight: currentTop };
 	});
 
-	// This derived value uses a performant binary search to find the visible items.
 	const visibleItems = $derived.by(() => {
 		const { items } = itemsWithPositions;
 		if (items.length === 0) return [];
 
-		// Identify the first item that starts at or after the viewport's top edge,
-		// then step back one by one to handle any tall items that started above the viewport but *extend into it* are included.
 		let low = 0;
 		let high = items.length - 1;
 		let firstIndex = items.length;
@@ -71,7 +58,7 @@
 				firstIndex = mid;
 				high = mid - 1;
 			} else {
-				low = mid + 1
+				low = mid + 1;
 			}
 		}
 
@@ -81,7 +68,6 @@
 			end++;
 		}
 
-		// Overscan to also render items outside the virtualized viewport
 		const startIndex = Math.max(0, start - OVERSCAN_COUNT);
 		const endIndex = Math.min(items.length - 1, end + OVERSCAN_COUNT);
 
@@ -93,40 +79,36 @@
 		return visible;
 	});
 
-
 	function measure(message: Message, top: number): Attachment<HTMLElement> {
-	return (node) => {
-		const updateHeight = (newHeight: number) => {
-			const oldHeight = measuredHeights.get(message) ?? ESTIMATED_HEIGHT;
-			const heightDifference = newHeight - oldHeight;
+		return (node) => {
+			const updateHeight = (newHeight: number) => {
+				const oldHeight = measuredHeights.get(message) ?? ESTIMATED_HEIGHT;
+				const heightDifference = newHeight - oldHeight;
 
-			if (Math.abs(heightDifference) < 1) return;
+				if (Math.abs(heightDifference) < 1) return;
 
-			if (top < scrollTop) scrollAdjustment += heightDifference;
+				if (top < scrollTop) scrollAdjustment += heightDifference;
 
-			measuredHeights.set(message, newHeight);
+				measuredHeights.set(message, newHeight);
+			};
+
+			const ro = new ResizeObserver((entries) => {
+				updateHeight(entries[0].contentRect.height);
+			});
+
+			ro.observe(node);
+
+			updateHeight(node.offsetHeight);
+			return () => ro.disconnect();
 		};
-
-
-		// Use a ResizeObserver to handle any subsequent changes.
-		const ro = new ResizeObserver((entries) => {
-			updateHeight(entries[0].contentRect.height);
-		});
-
-		ro.observe(node);
-
-		// Perform an initial, synchronous measurement as soon as the element is mounted.
-		updateHeight(node.offsetHeight);
-		return () => ro.disconnect();
-	};
-}
-
-$effect.pre(() => {
-	if (scrollAdjustment !== 0) {
-		chatLogElement.scrollTop += scrollAdjustment;
-		scrollAdjustment = 0;
 	}
-});
+
+	$effect.pre(() => {
+		if (scrollAdjustment !== 0) {
+			chatLogElement.scrollTop += scrollAdjustment;
+			scrollAdjustment = 0;
+		}
+	});
 
 	const scrollToBottom = () => {
 		if (chatLogElement) {
@@ -136,52 +118,16 @@ $effect.pre(() => {
 
 	$effect(() => {
 		itemsWithPositions.totalHeight;
-		if (shouldScrollToBottom && !pauseChatScroll) {
-			scrollToBottom();
-			if (
-				chatLogElement.scrollTop + clientHeight >=
-				itemsWithPositions.totalHeight - 1
-			) {
-				shouldScrollToBottom = false;
-			}
-		}
-	});
 
-	let ws: WebSocket;
+		if (messages.length > previousMessagesLength && !pauseChatScroll) {
+			scrollToBottom();
+		}
+
+		previousMessagesLength = messages.length;
+	});
 
 	onMount(() => {
 		scrollToBottom();
-		ws = new WebSocket(TWITCH_IRC_WS);
-
-		ws.addEventListener("open", () => {
-			ws.send(`NICK ${NICKNAME}`);
-			ws.send(`JOIN #${targetChannel}`);
-			console.log(`WebSocket opened for ${targetChannel}`);
-			sharedState.formMessage = `WebSocket opened for ${targetChannel}`;
-		});
-
-		ws.addEventListener("message", (e) => {
-			if (e.data.includes(NICKNAME)) return;
-			if (e.data.includes("PING")) {
-				ws.send(`PONG ${e.data}`);
-				return;
-			}
-			messages.push(parseIrc(e.data));
-			if (!pauseChatScroll) {
-				shouldScrollToBottom = true;
-			}
-		});
-
-		ws.addEventListener("error", (e) => console.error(e));
-
-		ws.addEventListener("close", () => {
-			console.log(`WebSocket closed for ${targetChannel}`);
-			sharedState.formMessage = `WebSocket closed for ${targetChannel}`;
-		});
-	});
-
-	onDestroy(() => {
-		ws.close();
 	});
 </script>
 
