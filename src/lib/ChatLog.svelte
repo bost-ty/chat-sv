@@ -10,7 +10,7 @@
 	const TWITCH_IRC_WS = "wss://irc-ws.chat.twitch.tv:443";
 	const NICKNAME = "justinfan1337";
 
-	let chats: HTMLDivElement; // Binding for the `chats` div in this component
+	let chatLogElement: HTMLDivElement; // Binding for the chat list div in this component
 
 	let { targetChannel, pauseOnHover, messages = $bindable() } = $props();
 	let isHovered = $state(false); // "Are we hovering the chat?"
@@ -22,7 +22,7 @@
 	});
 
 	const scrollToBottom = () => {
-		chats.scrollTop = chats.scrollHeight - chats.clientHeight;
+		chatLogElement.scrollTop = chatLogElement.scrollHeight - chatLogElement.clientHeight;
 	};
 
 	$effect(() => {
@@ -63,16 +63,16 @@
 </script>
 
 <div
-	id="chats"
 	class="chatLog {pauseOnHover ? '' : 'noPause'}"
 	role="list"
-	bind:this={chats}
+	bind:this={chatLogElement}
 	onmouseenter={() => (isHovered = true)}
 	onmouseleave={() => (isHovered = false)}
 >
 	{#each messages as { timestamp, username, message }}
 		<ChatMessage {timestamp} {username} {message} />
 	{/each}
+
 	{#if isHovered && pauseOnHover}
 		<div transition:fade={{ duration: 100 }} class="hoverMessage">
 			Scroll paused due to hover
