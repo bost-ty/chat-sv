@@ -1,84 +1,85 @@
 :root {
-	font-family: system-ui, sans-serif;
-	line-height: 1.5;
-	font-weight: 400;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-	--fg: oklch(86% .0034 264); /* light */
-	--bg: oklch(25% .0032 264); /* dark */
-	--int: oklch(from var(--bg) calc(l * 1.4) c h);
-	--ac: oklch(from var(--fg) calc(l * 0.85) c h);
+  --fg: oklch(86% 0.0034 264); /* light */
+  --bg: oklch(25% 0.0032 264); /* dark */
+  --int: oklch(from var(--bg) calc(l * 1.4) c h);
+  --ac: oklch(from var(--fg) calc(l * 0.85) c h);
 
-	color-scheme: dark light;
+  color-scheme: dark light;
 
-	color: var(--fg);
-	background-color: var(--bg);
+  color: var(--fg);
+  background-color: var(--bg);
 
-	font-synthesis: none;
-	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @media (prefers-color-scheme: light) {
-	:root {
-		--fg: oklch(25% .0032 264);
-		--bg: oklch(86% .0034 264);
-	}
+  :root {
+    --fg: oklch(25% 0.0032 264);
+    --bg: oklch(86% 0.0034 264);
+  }
 }
 
 html {
-	scrollbar-gutter: stable;
-	overflow: hidden;
+  scrollbar-gutter: stable;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-	font-size: 1rem;
-	margin: 0;
+  font-size: 1rem;
+  margin: 0;
 }
 
 h1,
 h2,
 h3 {
-	line-height: 1.2;
+  line-height: 1.2;
 }
 
 button,
 input {
-	border: 1px solid transparent;
-	font-size: 1rem;
-	padding: clamp(0.1rem, calc(0.1rem + 1svw), 0.4rem)
-		clamp(0.3rem, calc(0.3rem + 1svw), 1rem);
-	font-family: inherit;
-	color: inherit;
-	background-color: var(--int);
-	transition: border-color 100ms linear;
+  border: 1px solid transparent;
+  font-size: 1rem;
+  padding: clamp(0.1rem, calc(0.1rem + 1svw), 0.4rem)
+    clamp(0.3rem, calc(0.3rem + 1svw), 1rem);
+  font-family: inherit;
+  color: inherit;
+  background-color: var(--int);
+  transition: border-color 100ms linear;
 }
 
 button {
-	cursor: pointer;
-	border-radius: 0.1em;
+  cursor: pointer;
+  border-radius: 0.1em;
 }
 
 input {
-	padding: 0.2rem 0.4rem;
+  padding: 0.2rem 0.4rem;
 }
 
 button:hover,
 input:hover {
-	border-color: var(--ac);
+  border-color: var(--ac);
 }
 
 button:active {
-	transform: scale(0.95);
-	background-color: var(--bg);
+  transform: scale(0.95);
+  background-color: var(--bg);
 }
 button:focus,
 button:focus-visible,
 input:focus,
 input:focus-visible {
-	outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto -webkit-focus-ring-color;
 }

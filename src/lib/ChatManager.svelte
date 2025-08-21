@@ -50,9 +50,9 @@
 	}
 </script>
 
-<div class="chatManager" >
-	<div class="chatHeader" >
-		<div style="display: flex; flex-flow: row nowrap; align-items: center; gap: 0.3rem;" >
+<div class="chatManager">
+	<div class="chatHeader">
+		<div class="chatHeader_left">
 			<h2>
 				{targetChannel}
 			</h2>
@@ -75,19 +75,19 @@
 					{/if}
 					{pauseOnHover ? "Hold" : "Scroll"} on hover
 				</button >
-				<div class="chatRate">
-					<span class="rn">{chatRate}</span>&nbsp;chats per
-					<input
-						type="number"
-						min="1"
-						step="1"
-						max="60"
-						bind:value={intervalS}
-					/> s.
-				</div>
+			</div>
+			<div class="chatRate">
+				<span class="rn">{chatRate}</span>&nbsp;chats per
+				<input
+					type="number"
+					min="1"
+					step="1"
+					max="60"
+					bind:value={intervalS}
+				/> s.
+			</div>
 		</div>
-	</div>
-		<ChatLog {targetChannel} {pauseOnHover} bind:messages />
+	<ChatLog {targetChannel} {pauseOnHover} bind:messages />
 </div>
 
 <style>
@@ -107,7 +107,7 @@
 		padding-bottom: 0.3rem;
 		position: relative;
 		flex: 1 0 36%;
-		max-width: 49dvw;
+		width: clamp(40rem, calc(40rem + 1dvw), 49dvw);
 	}
 	.chatHeader {
 		display: flex;
@@ -117,12 +117,17 @@
 		gap: clamp(0rem, calc(0.1rem + 1svw), 0.3rem);
 		padding-inline: clamp(0rem, calc(0.1rem + 1svw), 0.3rem);
 	}
+	.chatHeader_left {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		gap: 0.3rem;
+	}
 	.chatRate {
 		display: flex;
 		flex-flow: row nowrap;
 		align-items: center;
 		flex-shrink: 0;
-		width: 12rem;
 	}
 	.chatRate input[type=number] {
 		width: 3ch;

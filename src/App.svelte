@@ -67,9 +67,9 @@
 		gap: 0.3rem;
 	}
 	section {
-		position: relative;
-		height: 100%;
-		width: 100%;
+		/* position: relative; */
+		/* height: 100%; */
+		/* width: 100%; */
 		margin: 0 auto;
 	}
 	form {
@@ -84,8 +84,6 @@
 		flex-flow: row wrap;
 		align-items: start;
 		overflow-x: hidden;
-		height: 100%;
-		min-height: 100svh;
 	}
 	.formMessage {
 		line-height: 1;
