@@ -3,6 +3,8 @@
 	import { fade } from "svelte/transition";
 	import type { Attachment } from "svelte/attachments";
 
+	import { throttle, debounce } from "./utils/controllers"
+
 	import ChatMessage from "./ChatMessage.svelte";
 
 	interface Message {
