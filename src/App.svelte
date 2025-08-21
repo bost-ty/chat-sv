@@ -2,7 +2,7 @@
 	import { MessageSquarePlus } from "lucide-svelte";
 	import ChatManager from "./lib/ChatManager.svelte";
 	import { sharedState } from "./lib/state.svelte";
-	import { getChannelsFromQueryParams } from "./utils/params";
+	import { getChannelsFromQueryParams } from "./lib/utils/params";
 
 	const url = new URL(window.location.href);
 	const channelState = getChannelsFromQueryParams(window.location.href);
