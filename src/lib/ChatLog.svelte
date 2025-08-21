@@ -1,62 +1,97 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import { fade } from "svelte/transition";
-	import type { Attachment } from "svelte/attachments";
+	import { fade } from 'svelte/transition';
+	import type { Attachment } from 'svelte/attachments';
 
-	import { throttle, debounce } from "./utils/controllers"
+	import ChatMessage from './ChatMessage.svelte';
 
-	import ChatMessage from "./ChatMessage.svelte";
-
-	interface Message {
+	type Message = {
 		timestamp: Date;
 		username: string;
 		message: string;
-	}
+		id?: string;
+	};
 
-	let {
-		pauseOnHover,
-		messages = $bindable()
-	}: {
+	interface Props {
 		pauseOnHover: boolean;
 		messages: Message[];
-	} = $props();
+	}
 
-	const ESTIMATED_HEIGHT = 28; // px
+	let { pauseOnHover, messages }: Props = $props();
+
+	const ESTIMATED_HEIGHT = 28;
 	const OVERSCAN_COUNT = 10;
 
-	let chatLogElement: HTMLDivElement;
-
+	let chatLogElement: HTMLDivElement | undefined = $state();
 	let clientHeight = $state(0);
 	let scrollTop = $state(0);
 	let isHovered = $state(false);
-	let previousMessagesLength = $state(messages.length);
 
-	let scrollAdjustment = $state(0);
+	let isScrollScheduled = false;
 
-	let pauseChatScroll = $derived(pauseOnHover && isHovered);
-	let measuredHeights = $state(new Map<Message, number>());
-
-	const itemsWithPositions = $derived.by(() => {
-		let currentTop = 0;
-		const items = [];
-		for (const message of messages) {
-			const height = measuredHeights.get(message) ?? ESTIMATED_HEIGHT;
-			items.push({ message, top: currentTop, height });
-			currentTop += height;
+	function onScroll() {
+		if (!isScrollScheduled && chatLogElement) {
+			isScrollScheduled = true;
+			requestAnimationFrame(() => {
+				scrollTop = chatLogElement!.scrollTop;
+				isScrollScheduled = false;
+			});
 		}
-		return { items, totalHeight: currentTop };
-	});
+	}
 
-	const visibleItems = $derived.by(() => {
-		const { items } = itemsWithPositions;
-		if (items.length === 0) return [];
+	const isAtBottom = $derived(
+		!chatLogElement || chatLogElement.scrollHeight - chatLogElement.scrollTop - clientHeight < 1
+	);
+
+	const isPaused = $derived(pauseOnHover && (isHovered || !isAtBottom));
+	const pauseMessage = $derived(isHovered ? 'Chat paused due to hover' : 'Chat paused due to scroll');
+
+	function scrollToBottom() {
+		if (chatLogElement) {
+			chatLogElement.scrollTop = chatLogElement.scrollHeight;
+		}
+	}
+
+	function handleMouseLeave() {
+		isHovered = false;
+		scrollToBottom();
+	}
+
+	const localIds = new WeakMap<Message, string>();
+	let nextId = 0;
+	function getMessageId(message: Message): string {
+		if (message.id) {
+			return message.id;
+		}
+		if (!localIds.has(message)) {
+			localIds.set(message, `local-${nextId++}`);
+		}
+		return localIds.get(message)!;
+	}
+
+	let measuredHeights = $state(new Map<string, number>());
+
+	const virtual = $derived.by(() => {
+		let totalHeight = 0;
+		const items: { id: string; message: Message; top: number; height: number }[] = [];
+
+		for (const message of messages) {
+			const id = getMessageId(message);
+			const height = measuredHeights.get(id) ?? ESTIMATED_HEIGHT;
+			items.push({ id, message, top: totalHeight, height });
+			totalHeight += height;
+		}
+
+		if (items.length === 0) {
+			return { totalHeight: 0, visibleItems: [] };
+		}
 
 		let low = 0;
 		let high = items.length - 1;
 		let firstIndex = items.length;
+
 		while (low <= high) {
-			const mid = low + ((high - low) >> 1);
-			if (items[mid].top >= scrollTop) {
+			const mid = (low + high) >> 1;
+			if (items[mid].top + items[mid].height >= scrollTop) {
 				firstIndex = mid;
 				high = mid - 1;
 			} else {
@@ -64,108 +99,112 @@
 			}
 		}
 
-		const start = Math.max(0, firstIndex - 1);
-		let end = start;
+		let end = firstIndex;
 		while (end < items.length && items[end].top < scrollTop + clientHeight) {
 			end++;
 		}
 
-		const startIndex = Math.max(0, start - OVERSCAN_COUNT);
-		const endIndex = Math.min(items.length - 1, end + OVERSCAN_COUNT);
+		const startIndex = Math.max(0, firstIndex - OVERSCAN_COUNT);
+		const endIndex = Math.min(items.length, end + OVERSCAN_COUNT);
 
-		const visible = [];
-		for (let i = startIndex; i <= endIndex; i++) {
-			visible.push(items[i]);
-		}
-
-		return visible;
+		return {
+			totalHeight,
+			visibleItems: items.slice(startIndex, endIndex)
+		};
 	});
 
-	function measure(message: Message, top: number): Attachment<HTMLElement> {
+	let wasAnchored = true;
+	let prevScrollHeight = 0;
+
+	$effect.pre(() => {
+		if (!chatLogElement) return;
+		virtual.totalHeight;
+
+		wasAnchored =
+			chatLogElement.scrollHeight - chatLogElement.scrollTop - chatLogElement.clientHeight < 1;
+
+		if (!wasAnchored) {
+			prevScrollHeight = chatLogElement.scrollHeight;
+		}
+	});
+
+	$effect(() => {
+		if (!chatLogElement) return;
+		virtual.totalHeight;
+
+		if (isPaused) {
+			return;
+		}
+
+		if (wasAnchored) {
+			chatLogElement.scrollTop = chatLogElement.scrollHeight;
+		} else {
+			chatLogElement.scrollTop += chatLogElement.scrollHeight - prevScrollHeight;
+		}
+	});
+
+	function measure(id: string): Attachment {
 		return (node) => {
-			const updateHeight = (newHeight: number) => {
-				const oldHeight = measuredHeights.get(message) ?? ESTIMATED_HEIGHT;
-				const heightDifference = newHeight - oldHeight;
-
-				if (Math.abs(heightDifference) < 1) return;
-
-				if (top < scrollTop) scrollAdjustment += heightDifference;
-
-				measuredHeights.set(message, newHeight);
-			};
-
 			const ro = new ResizeObserver((entries) => {
-				updateHeight(entries[0].contentRect.height);
+				const height = entries[0].contentRect.height;
+				if (measuredHeights.get(id) !== height) {
+					const newHeights = new Map(measuredHeights);
+					newHeights.set(id, height);
+					measuredHeights = newHeights;
+				}
 			});
 
 			ro.observe(node);
 
-			updateHeight(node.offsetHeight);
 			return () => ro.disconnect();
 		};
 	}
-
-	$effect.pre(() => {
-		if (scrollAdjustment !== 0) {
-			chatLogElement.scrollTop += scrollAdjustment;
-			scrollAdjustment = 0;
-		}
-	});
-
-	const scrollToBottom = () => {
-		if (chatLogElement) {
-			chatLogElement.scrollTop = chatLogElement.scrollHeight - chatLogElement.clientHeight;
-		}
-	};
-
-	$effect(() => {
-		itemsWithPositions.totalHeight;
-
-		if (messages.length > previousMessagesLength && !pauseChatScroll) {
-			scrollToBottom();
-		}
-
-		previousMessagesLength = messages.length;
-	});
-
-	onMount(() => {
-		scrollToBottom();
-	});
 </script>
 
-<div
-	class="chatLog {pauseOnHover ? '' : 'noPause'}"
-	role="list"
-	bind:this={chatLogElement}
-	bind:clientHeight
-	onscroll={(e) => (scrollTop = (e.currentTarget as HTMLDivElement).scrollTop)}
-	onmouseenter={() => (isHovered = true)}
-	onmouseleave={() => (isHovered = false)}
->
-	<div style="position: relative; height: {itemsWithPositions.totalHeight}px; min-height: 100%;">
-		{#each visibleItems as item (item.message)}
-			<div
-				style="position: absolute; top: {item.top}px; left: 0; right: 0;"
-				{@attach measure(item.message, item.top)}
-			>
-				<ChatMessage
-					timestamp={item.message.timestamp}
-					username={item.message.username}
-					message={item.message.message}
-				/>
-			</div>
-		{/each}
+<div class="container">
+	<div
+		class="chatLog"
+		role="list"
+		bind:this={chatLogElement}
+		bind:clientHeight
+		onscroll={onScroll}
+		onmouseenter={() => (isHovered = true)}
+		onmouseleave={handleMouseLeave}
+	>
+		<div
+			style:height="{virtual.totalHeight}px"
+			style="position: relative; min-height: 100%; width: 100%;"
+		>
+			{#each virtual.visibleItems as item (item.id)}
+				<div
+					style="position: absolute; top: {item.top}px; left: 0; right: 0;"
+					{@attach measure(item.id)}
+				>
+					<ChatMessage
+						timestamp={item.message.timestamp}
+						username={item.message.username}
+						message={item.message.message}
+					/>
+				</div>
+			{/each}
+		</div>
 	</div>
 
-	{#if isHovered && pauseOnHover}
+	{#if isPaused}
 		<div transition:fade={{ duration: 100 }} class="hoverMessage">
-			Scroll paused due to hover
+			{pauseMessage}
 		</div>
 	{/if}
 </div>
 
 <style>
+	.container {
+		position: relative;
+		height: 80svh;
+	}
 	.chatLog {
+		position: absolute;
+		inset: 0;
 		padding: 0.1rem 0.3rem;
 		border-radius: 0.1rem;
 		margin: 0;
@@ -173,7 +212,6 @@
 		overflow-y: scroll;
 		overflow-x: hidden;
 		white-space: break-word;
-		height: 80svh;
 		border: 1px solid transparent;
 		--sp: hsl(from var(--ac) h s calc(l * 0.8));
 		--spa: hsla(from var(--sp) h s l / 20%);
@@ -185,7 +223,7 @@
 		border-color: var(--sp);
 		scrollbar-color: var(--sp) var(--spa);
 	}
-	.noPause:hover {
+	.chatLog:not(:hover) {
 		border-color: hsla(from var(--spa) h s l / 20%);
 	}
 	.hoverMessage {
@@ -201,5 +239,7 @@
 		background-color: var(--int);
 		border: 1px solid var(--ac);
 		color: var(--fg);
+		z-index: 10;
+		pointer-events: none;
 	}
 </style>
