@@ -1,12 +1,12 @@
 # chat-sv
 
-A simple frontend for reading Twitch chat. Built with Svelte 5.
+A simple frontend for reading Twitch chat, built with Svelte 5.
 
 ## Features
 
 - Runs entirely in the browser
 - Connects to Twitch anonymously
-- Provides a customizable "chats per X minutes" display
-- Uses a fun lil' function to collapse each username into a hue such that similar names end up with divergent colors, making them easy to tell apart even if they're spelled very similarly.
-- A Twitch-like "pause on hover" for reading chat more easily
-- Does not implement virtualization/virtual lists/windowed rendering, so with multiple high-volume connected channels, performance can suffer. (This is great for testing out Svelte's performance!)
+- Customizable chat rate display
+- Converts each chatter's username into a unique color, making them easy to tell apart even if the usernames are very similar
+- Chat scrolling pauses on hover for easy reading and scrollback
+- Custom virtual list implementation for rendering thousands and thousands of chat messages without any lag, even during window or chat pane resizing
